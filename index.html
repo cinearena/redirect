@@ -106,39 +106,20 @@
   <script>
   const contentDiv = document.getElementById('content');
   const countdownElement = document.getElementById('countdown');
-  const heading = document.querySelector('#redirect-heading');
+  const heading = document.getElementById('redirect-heading');
   let countdown = 10;
-  let redirectUrl = 'https://cinearena.live'; // fallback redirect
 
-  function getMovieNameFromUrl() {
+  // Get full redirect URL from the query parameter
+  function getRedirectUrlFromParams() {
     const params = new URLSearchParams(window.location.search);
-    return params.get('movie') || '';
+    return params.get('url') || null;
   }
 
-  async function fetchRedirectUrl(movieName) {
-    const fetchUrl = `https://cinearena.github.io/${movieName}`;
-    try {
-      const response = await fetch(fetchUrl);
-      if (!response.ok) throw new Error('Movie file not found on GitHub');
-      const url = await response.text();
-      return url.trim();
-    } catch (error) {
-      console.error('Error fetching movie redirect URL:', error);
-      return redirectUrl; // fallback
-    }
-  }
+  const redirectUrl = getRedirectUrlFromParams();
 
-  // Start countdown and fetch
-  (async function () {
-    const movieName = getMovieNameFromUrl();
-
-    if (!movieName) {
-      heading.textContent = 'Invalid movie name in URL';
-      return;
-    }
-
-    redirectUrl = await fetchRedirectUrl(movieName);
-
+  if (!redirectUrl || !redirectUrl.startsWith('http')) {
+    heading.textContent = 'Invalid or missing redirect URL';
+  } else {
     const interval = setInterval(() => {
       countdown--;
       countdownElement.textContent = countdown;
@@ -148,13 +129,13 @@
         showRedirectButton();
       }
     }, 1000);
-  })();
+  }
 
   function showRedirectButton() {
-    heading.textContent = '👇Click to open movie👇';
+    heading.textContent = '👇 Click to open movie 👇';
 
     const button = document.createElement('button');
-    button.textContent = 'Go to Next Page';
+    button.textContent = 'Go to Movie Page';
     button.className = 'mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-lg transition duration-300';
     button.onclick = () => {
       window.location.href = redirectUrl;
@@ -164,6 +145,7 @@
     contentDiv.appendChild(button);
   }
 </script>
+
 
 
 	<!-- Socialbar-->
