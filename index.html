@@ -81,7 +81,9 @@
   <!-- Countdown Box -->
 	  <center>
   <div class=" flex-grow flex flex-col bg-white rounded-lg shadow-lg p-8 w-full max-w-md text-center items-center justify-center p-4">
-    <h2 id="redirect-heading" class="text-2xl font-semibold text-gray-800 mb-4">Redirecting in</h2>
+   <h2 id="redirect-heading" class="text-2xl font-semibold text-gray-800 mb-4">
+  Redirecting in
+</h2>
     <div id="content">
       <div id="countdown" class="text-6xl font-bold text-primary">10</div>
     </div>
@@ -102,61 +104,65 @@
   </footer>
 
   <script>
-    const contentDiv = document.getElementById('content');
-let countdown = 10;
-let redirectUrl = 'https://cinearena.github.io'; // fallback
+  const contentDiv = document.getElementById('content');
+  const countdownElement = document.getElementById('countdown');
+  let countdown = 10;
+  let redirectUrl = 'https://cinearena.live'; // fallback
 
-function getMovieNameFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('movie') || 'default_movie';
-}
-
-const movieName = getMovieNameFromUrl();
-const fetchUrl = `https://cinearena.github.io/${movieName}`;
-
-// Fetch redirect URL from GitHub page
-fetch(fetchUrl)
-  .then(response => {
-    if (!response.ok) throw new Error('Network error');
-    return response.text();
-  })
-  .then(text => {
-    redirectUrl = text.trim();
-    console.log('Redirect URL fetched:', redirectUrl);
-  })
-  .catch(err => {
-    console.error('Failed to fetch redirect URL:', err);
-  });
-
-const countdownElement = document.getElementById('countdown');
-
-const interval = setInterval(() => {
-  countdown--;
-  countdownElement.textContent = countdown;
-
-  if (countdown === 0) {
-    clearInterval(interval);
-    showRedirectButton();
+  // Step 1: Get ?movie= value from URL
+  function getMovieNameFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('movie') || '';
   }
-}, 1000);
 
-function showRedirectButton() {
-  const heading = document.querySelector('#redirect-heading');
-  if (heading) heading.textContent = 'Click to open movie';
+  // Step 2: Construct GitHub fetch URL
+  const movieName = getMovieNameFromUrl();
 
-  const button = document.createElement('button');
-  button.textContent = 'Go to Next Page';
-  button.className = 'mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-lg transition duration-300';
-  button.onclick = () => {
-    window.location.href = redirectUrl;
-  };
+  if (movieName) {
+    const fetchUrl = `https://cinearena.github.io/${movieName}`;
+    fetch(fetchUrl)
+      .then(response => {
+        if (!response.ok) throw new Error('File not found');
+        return response.text();
+      })
+      .then(data => {
+        redirectUrl = data.trim(); // The fetched file should contain the final redirect URL
+        console.log('Fetched redirect URL:', redirectUrl);
+      })
+      .catch(error => {
+        console.error('Error fetching movie redirect URL:', error);
+      });
+  } else {
+    console.error('No movie name found in URL');
+  }
 
-  contentDiv.innerHTML = '';
-  contentDiv.appendChild(button);
-}
+  // Step 3: Countdown Logic
+  const interval = setInterval(() => {
+    countdown--;
+    countdownElement.textContent = countdown;
 
+    if (countdown === 0) {
+      clearInterval(interval);
+      showRedirectButton();
+    }
+  }, 1000);
 
-  </script>
+  // Step 4: Show Redirect Button and Change Heading
+  function showRedirectButton() {
+    const heading = document.querySelector('#redirect-heading');
+    if (heading) heading.textContent = 'Click to open movie 👇';
+
+    const button = document.createElement('button');
+    button.textContent = 'Go to Next Page';
+    button.className = 'mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-lg transition duration-300';
+    button.onclick = () => {
+      window.location.href = redirectUrl;
+    };
+
+    contentDiv.innerHTML = '';
+    contentDiv.appendChild(button);
+  }
+</script>
 
 
 	<!-- Socialbar-->
